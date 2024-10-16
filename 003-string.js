@@ -28,3 +28,107 @@ Row 2: _ 0 0    0 0 X _     _ _ _
 Row 1: _ 0 0    0 0 0 0     0 0 _
 
 */
+
+
+const emptyRow = ['A','B','C','D','E','F','G','H','J','K'];
+const indexTable = {'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7,'J':8,'K':9}
+
+
+function isLetter(n) {
+    return /^[A-Za-z]$/.test(n)
+};
+
+function checkSeat(arr) {
+    let isValid = true;
+
+    arr.forEach(seat => {
+        if(!isLetter(seat)) {
+            isValid = false;
+            return;
+        }
+    })
+    return isValid;
+}
+
+
+
+class SeatMap {
+    constructor(rows) {
+        this.rows = [];
+    };
+
+    addRows(number) {
+        for (let i = 0; i < number; i++) {
+            this.rows[i] =[...emptyRow];
+        }
+    };
+
+    reserve(info) {
+        const order = info.split(" ");
+        if(order[0] === '') return;
+
+        order.forEach(seatInfo => {
+            let row = parseInt(seatInfo.slice(0,-1)) - 1;
+            let seatIndex = indexTable[seatInfo.slice(-1)];
+
+            this.rows[row][seatIndex] = 'X';
+        })
+    };
+
+    calcFamilyRow(row) {
+        let families = 0;
+    
+        const leftBlock = [row[1], row[2], row[3], row[4]];    
+        const rightBlock = [row[5], row[6], row[7], row[8]];
+        const middleBlock = [row[3], row[4], row[5], row[6]];
+    
+        if (leftBlock.every(seat => seat !== 'X')) {
+            families++;
+        }
+        
+        if (rightBlock.every(seat => seat !== 'X')) {
+            families++;
+        }
+        
+        if (families === 0 && middleBlock.every(seat => seat !== 'X')) {
+            families++;
+        }
+
+        return families;
+    };
+
+    calcTotalFamilies() {
+        let totalFamilies = 0;
+        this.rows.forEach(row => {
+            totalFamilies += this.calcFamilyRow(row);
+        });
+        return totalFamilies;
+    }
+
+};
+
+function solution(N, S) {
+    let map = new SeatMap();
+    map.addRows(N);
+    map.reserve(S);
+    return map.calcTotalFamilies();
+}
+
+// const reserveInfo = "1A 2F 1C";
+// let order = reserveInfo.split(" ");
+// console.log(order);
+
+// let map = new SeatMap();
+// map.addRows(2);
+
+// map.reserve(reserveInfo);
+// console.log(map.rows);
+// console.log(map.calcFamilies());
+
+// const N = 1;
+// const S = "";
+// let map= new SeatMap();
+// map.addRows(N);
+
+// map.reserve(S);
+// console.log(map.calcFamilies());
